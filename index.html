@@ -163,13 +163,18 @@
         .epilogue h2, .epilogue p { color: #1a202c; }
 
         .final-message {
-            font-size: clamp(1.2rem, 4vw, 2.5rem);
+            font-size: clamp(1.2rem, 3.5vw, 2.5rem); /* 最大サイズを少し抑えめに調整 */
             font-weight: 900;
             line-height: 1.8;
-            margin: 40px 0;
-            word-break: keep-all;
+            margin: 40px auto;
             color: #0a192f;
-        }
+            text-align: center;
+            word-break: normal;      /* 単語の途中で切れないようにしつつ改行を許可 */
+            overflow-wrap: break-word; /* 長い文章が画面を突き抜けないようにする */
+            max-width: 100%;         /* 画面幅を超えないように制限 */
+            padding: 0 5%;           /* 左右に少し余白を作る */
+            box-sizing: border-box;
+        } 
 
         /* Footer */
         footer {
@@ -277,8 +282,12 @@
             <p>机上の計算では、車体は180度完璧に回るはずだった。しかし、現実はそう簡単なものではない。</p>
             <div class="process-grid">
                 <div class="card">
-                    <span class="highlight">● 実測・調整をひたすら繰り返す泥臭い作業</span>
+                    <span class="highlight">● 実測に基づく泥臭い作業</span>
                     <p>サーボ角度の1度、旋回時間の0.1秒。記録と実行を繰り返す、果てしない泥臭い作業を続けてきた。</p>
+                </div>
+                <div class="card">
+                    <span class="highlight">● 共有の精神</span>
+                    <p>個人の気づきをチーム内で共有するための回路図。</p>
                 </div>
             </div>
             <p class="conclusion">創成とは、現実との対話を続け、理想とのギャップを埋め続ける終わりのない「泥臭い作業」を続けることではなかろうか。</p>
@@ -292,8 +301,8 @@
         
         <div class="final-message">
             「創成」とは、ただモノを作ることではない。<br>
-            直面した課題に対し、自分たちが持ちうるすべての技術と野心で<br>
-            <span style="border-bottom: 2px solid #000;">最適解をひねり出し続ける姿勢</span>のことだと考える。
+            直面した課題に対し、技術と野心で<br>
+            <span style="border-bottom: 2px solid #000;">最適解をひねり出す姿勢</span>のことだと考える。
         </div>
         
         <p style="margin-top: 50px; color: #666; font-size: 0.9rem;">A1班では、このプロジェクトを通して、新しいモノだけでなく、<br>新しい「自分たちの考え方」をも創成した。</p>
@@ -431,5 +440,4 @@
         });
     </script>
 </body>
-
 </html>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創成とは？ | Innovators A1 Special Feature</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@900&family=Noto+Sans+JP:wght@100;300;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0a192f;
+            --accent-color: #64ffda;
+            --text-color: #e6f1ff;
+            --card-bg: rgba(255, 255, 255, 0.07);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Noto Sans JP', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* 3D Canvas Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Loading Overlay */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Noto Serif JP', serif;
+            letter-spacing: 0.5em;
+            color: var(--accent-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(2.5rem, 10vw, 10rem);
+            margin: 0;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 20px rgba(100, 255, 218, 0.4);
+            opacity: 0;
+            transform: translateY(50px);
+            white-space: normal; /* モバイルで改行を許可 */
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            color: var(--accent-color);
+            letter-spacing: clamp(0.3em, 1.5vw, 1em);
+            margin-top: 15px;
+            opacity: 0;
+        }
+
+        /* Section Styling */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 10%;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .content-wrapper {
+            max-width: 800px;
+            z-index: 10;
+            width: 100%;
+        }
+
+        h2 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(1.8rem, 5vw, 3.5rem);
+            margin-bottom: 30px;
+            line-height: 1.3;
+            color: #fff;
+        }
+
+        .chapter-num {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            letter-spacing: 0.3em;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: clamp(1rem, 1.1vw, 1.2rem);
+            font-weight: 300;
+            color: rgba(230, 241, 255, 0.9);
+            margin-bottom: 1.5em;
+        }
+
+        .highlight { color: var(--accent-color); font-weight: 700; }
+
+        /* Modern Grid */
+        .process-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(20px, 4vw, 40px);
+            margin-top: 40px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: clamp(20px, 3vw, 30px);
+            border-left: 2px solid var(--accent-color);
+            backdrop-filter: blur(10px);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .conclusion {
+            margin-top: 40px;
+            font-size: clamp(1rem, 1.2vw, 1.2rem);
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--accent-color);
+            display: inline-block;
+            padding-bottom: 8px;
+        }
+
+        /* Epilogue */
+        .epilogue {
+            background: #f8fafd;
+            color: #1a202c;
+            text-align: center;
+            padding: clamp(100px, 15vh, 150px) 10%;
+        }
+
+        .epilogue h2, .epilogue p { color: #1a202c; }
+
+        .final-message {
+            font-size: clamp(1.2rem, 4vw, 2.5rem);
+            font-weight: 900;
+            line-height: 1.8;
+            margin: 40px 0;
+            word-break: keep-all;
+            color: #0a192f;
+        }
+
+        /* Footer */
+        footer {
+            background: #f8fafd;
+            color: #718096;
+            padding: 40px 10%;
+            text-align: center;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Scroll Progress Bar */
+        #progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: var(--accent-color);
+            z-index: 1000;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* Media Queries for Tablet and Mobile */
+        @media (max-width: 992px) {
+            .process-grid {
+                grid-template-columns: 1fr;
+            }
+            section {
+                padding: 60px 8%;
+            }
+        }
+
+        @media (max-width: 600px) {
+            section {
+                padding: 40px 6%;
+            }
+            .hero-title {
+                letter-spacing: 0.05em;
+            }
+            .final-message {
+                line-height: 1.6;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">INITIALIZING...</div>
+    <div id="progress"></div>
+    <div id="canvas-container"></div>
+
+    <div class="hero">
+        <h1 class="hero-title">創成とは？</h1>
+        <p class="hero-subtitle">私たちが考える創成について</p>
+    </div>
+
+    <section id="prologue">
+        <div class="content-wrapper">
+            <span class="chapter-num">PROLOGUE</span>
+            <h2>辞書にない「創成」を探して</h2>
+            <p>「創成」という言葉を辞書で引けば、<strong>「新しく作り上げること」、「初めてつくり上げること」</strong>などが出てくる。</p>
+            <p>しかし、この数ヶ月間、私たちが課題を達成するモビリティの開発・改良を通して経験してきた「創成」は、そのような綺麗な一言で片付けられるものではなかった。</p>
+            <p>車体の設計や改良・回路の設計で頭を悩ませ、普段触れることのないコードに溺れ、失敗の数だけ自分たちをアップデートしてきたA1班の歩み。そこから導き出した「3つの解」をここに記録しておきたい。</p>
+        </div>
+    </section>
+
+    <section id="chapter1">
+        <div class="content-wrapper">
+            <span class="chapter-num">CHAPTER 01</span>
+            <h2>創成とは「壊して、繋ぐ」こと</h2>
+            <div class="process-grid">
+                <div class="card">
+                    <h4>ゼロからの脱却</h4>
+                    <p>強度計算・印刷まで終えた車体を、推力不足という現実の前に「捨てる」勇気。せっかく製作したものを捨てることに高いハードルを感じたが、本当の設計はここから始まった。</p>
+                </div>
+                <div class="card">
+                    <h4>柔軟な判断力</h4>
+                    <p>目的は「自律走行」であり、ファンを回すことではない。手段に固執せず、課題を確実に達成するための柔軟な判断力が求められてきました。</p>
+                </div>
+            </div>
+            <p class="conclusion">創成とは、過去の自分を潔く壊し、未来へ繋ぎ直す「破壊的創造」ではなかろうか。</p>
+        </div>
+    </section>
+
+    <section id="chapter2">
+        <div class="content-wrapper">
+            <span class="chapter-num">CHAPTER 02</span>
+            <h2>創成とは「見えない調和」を編むこと</h2>
+            <p>車体が動く。それは単に部品を組み合わせたからではない。無秩序な電子の群れを制御する、また軸足ともなる「設計思想」が必要である。</p>
+            <div class="card" style="margin-bottom: 20px;">
+                <p><span class="highlight">● 回路の色分け</span><br>配線の色分けやモジュール構造は、単なる整理整頓ではない。トラブルに数秒で即応するための「設計思想」の具現化したものである。</p>
+            </div>
+            <div class="card">
+                <p><span class="highlight">● 電力の分離</span><br>マイコンとモーター。異なる性質のものを共存させるための「見えない工夫」が、90%以上の成功率を支える土台ともなっている。</p>
+            </div>
+            <p class="conclusion">バラバラの部品に「ロジック」を吹き込み、システムへ昇華させる。それが創成の醍醐味ではなかろうか。</p>
+        </div>
+    </section>
+
+    <section id="chapter3">
+        <div class="content-wrapper">
+            <span class="chapter-num">CHAPTER 03</span>
+            <h2>創成とは「泥臭く」立ち向かうこと</h2>
+            <p>机上の計算では、車体は180度完璧に回るはずだった。しかし、現実はそう簡単なものではない。</p>
+            <div class="process-grid">
+                <div class="card">
+                    <span class="highlight">● 実測に基づく泥臭い作業</span>
+                    <p>サーボ角度の1度、旋回時間の0.1秒。記録と実行を繰り返す、果てしない泥臭い作業を続けてきた。</p>
+                </div>
+                <div class="card">
+                    <span class="highlight">● 共有の精神</span>
+                    <p>個人の気づきをチーム内で共有するための回路図。</p>
+                </div>
+            </div>
+            <p class="conclusion">創成とは、現実との対話を続け、理想とのギャップを埋め続ける終わりのない「泥臭い作業」を続けることではなかろうか。</p>
+        </div>
+    </section>
+
+    <div class="epilogue">
+        <span class="chapter-num" style="color: #666;">EPILOGUE</span>
+        <h2>創成の先にあるもの</h2>
+        <p>私たちが作り上げたのは、150mm四方の小さなモビリティかもしれない。<br>しかし、そこには数えきれない「失敗」「方針転換」「改善」が詰まっている。</p>
+        
+        <div class="final-message">
+            「創成」とは、ただモノを作ることではない。<br>
+            直面した課題に対し、自分たちが持ちうるすべての技術と野心で<br>
+            <span style="border-bottom: 2px solid #000;">最適解をひねり出し続ける姿勢</span>のことだと考える。
+        </div>
+        
+        <p style="margin-top: 50px; color: #666; font-size: 0.9rem;">A1班では、このプロジェクトを通して、新しいモノだけでなく、<br>新しい「自分たちの考え方」をも創成した。</p>
+    </div>
+
+    <footer>
+        © 創成プロジェクト A1班. All rights reserved.
+    </footer>
+
+    <script>
+        /**
+         * 3D Scene Setup (Three.js)
+         */
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // パフォーマンス最適化
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const count = window.innerWidth < 600 ? 1500 : 3000; // モバイルでは粒子数を減らす
+        const positions = new Float32Array(count * 3);
+        for(let i = 0; i < count * 3; i++) {
+            positions[i] = (Math.random() - 0.5) * 10;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.015,
+            color: 0x64ffda,
+            transparent: true,
+            opacity: 0.6
+        });
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        // Geometric Object
+        const geometry = new THREE.IcosahedronGeometry(1.5, 1);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0x64ffda, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        camera.position.z = 3;
+
+        // Mouse/Touch interaction
+        let mouseX = 0, mouseY = 0;
+        const handleMove = (x, y) => {
+            mouseX = (x / window.innerWidth - 0.5) * 0.4;
+            mouseY = (y / window.innerHeight - 0.5) * 0.4;
+        };
+
+        document.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) handleMove(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            mesh.rotation.y += 0.002;
+            mesh.rotation.x += 0.001;
+            particles.rotation.y += 0.0003;
+            
+            camera.position.x += (mouseX - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        /**
+         * GSAP Animations
+         */
+        gsap.registerPlugin(ScrollTrigger);
+
+        window.addEventListener('load', () => {
+            gsap.to("#loader", { opacity: 0, duration: 1, delay: 0.5, onComplete: () => {
+                document.getElementById('loader').style.display = 'none';
+                initAnimations();
+            }});
+        });
+
+        function initAnimations() {
+            gsap.to(".hero-title", { opacity: 1, y: 0, duration: 1.5, ease: "power4.out" });
+            gsap.to(".hero-subtitle", { opacity: 1, duration: 1, delay: 0.8 });
+
+            gsap.to("#progress", {
+                width: "100%",
+                scrollTrigger: { scrub: 0.3 }
+            });
+
+            document.querySelectorAll('section').forEach(section => {
+                gsap.from(section.querySelectorAll('.content-wrapper > *'), {
+                    y: 30,
+                    opacity: 0,
+                    duration: 0.8,
+                    stagger: 0.15,
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 75%",
+                    }
+                });
+
+                gsap.to(mesh.rotation, {
+                    z: Math.PI,
+                    scrollTrigger: {
+                        trigger: section,
+                        scrub: 1
+                    }
+                });
+            });
+            
+            // スケール調整（画面幅に合わせて縮小）
+            const targetScale = window.innerWidth < 600 ? 1.2 : 1.8;
+            gsap.to(mesh.scale, {
+                x: targetScale, y: targetScale, z: targetScale,
+                scrollTrigger: {
+                    trigger: "#chapter2",
+                    scrub: true
+                }
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        });
+    </script>
+</body>
+</html>

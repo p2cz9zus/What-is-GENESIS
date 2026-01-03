@@ -219,6 +219,35 @@
                 line-height: 1.6;
             }
         }
+
+        /* Back Button Style */
+        .back-button {
+            display: inline-block;
+            padding: 15px 40px;
+            color: #0a192f;
+            text-decoration: none;
+            border: 2px solid #0a192f;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .back-button:hover {
+            color: #fff;
+            background: #0a192f;
+        }
+
+        .back-button i {
+            margin-right: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .back-button:hover i {
+            transform: translateX(-5px);
+        }
     </style>
 </head>
 <body>
@@ -303,6 +332,12 @@
         </div>
         
         <p style="margin-top: 50px; color: #666; font-size: 0.9rem;">A1班では、このプロジェクトを通して、新しいモノだけでなく、<br>新しい「自分たちの考え方」をも創成した。</p>
+    </div>
+
+    <div style="text-align: center; background: #f8fafd; padding-bottom: 50px;">
+        <a href="https://p2cz9zus.github.io/Democar-project/" class="back-button">
+            <i class="fas fa-arrow-left"></i> TOPへ戻る
+        </a>
     </div>
 
     <footer>
@@ -438,6 +473,7 @@
     </script>
 </body>
 </html>
+
 
 
 
